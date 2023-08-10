@@ -251,7 +251,7 @@ class SDFChainRadix2[T <: Data : Real : BinaryRepresentation](val params: FFTPar
   outQueue.io.enq.valid := outValid
   outQueue.io.deq.ready := io.out.ready 
   val scalar = if (params.expandLogic.sum == 0 && !params.keepMSBorLSBReg) ConvertableTo[T].fromDouble(1.0) else ConvertableTo[T].fromDouble(1.0 / params.numPoints.toDouble)
-  io.in.ready := ShiftRegister((~initialOutDone), outputLatency, resetData = false.B, en = true.B) || (io.out.ready && (state =/= sFlush))
+  io.in.ready := (~initialInDone) || (io.out.ready && (state =/= sFlush))
   
   if (latency == 0) {
     when (fftOrifft === true.B) {
