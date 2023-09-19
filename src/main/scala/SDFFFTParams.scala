@@ -52,21 +52,21 @@ case class FFTParams[T <: Data] (
   final val allowedSDFRadices    = Seq("2","2^2")
 
   // Common require functions used in FFT blocks
-  def checkNumPointsPow2() {
+  def checkNumPointsPow2(): Unit = {
     require(isPow2(numPoints), "number of points must be a power of 2")
   }
-  def checkFftType() {
+  def checkFftType(): Unit = {
     require(allowedFftTypes.contains(fftType), s"""FFT type must be one of the following: ${allowedFftTypes.mkString(", ")}""")
   }
 //   def checkDecimType() {
 //     require(allowedDecimTypes.contains(decimType), s"""Decimation type must be one of the following: ${allowedDecimTypes.mkString(", ")}""")
 //   }
-  def checkSDFRadix() {
+  def checkSDFRadix(): Unit = {
     require(allowedSDFRadices.contains(sdfRadix), s"""Radix must be one of the following: ${allowedSDFRadices.mkString(", ")}""")
   }
 
   // muxes can not accept nonequal data types beccause of that only specific stages can support grow logic
-  def checkExpandLogic() {
+  def checkExpandLogic(): Unit = {
     //used only for radix 2^2 and full run time configurability
     if (decimType == DIFDecimType || (decimType == DITDecimType && (expandLogic.size % 2 == 0))) {
       expandLogic.tail.zipWithIndex.collect{ case (e,i) if ((i+1) % 2) == 0 => e }.foreach { grow => require(grow == 0, "Inappropiate settings for growing logic!") }
@@ -84,7 +84,7 @@ case class FFTParams[T <: Data] (
     */
   }
   // combinational loop occurs for pipeline = 0 and radix 2^2 module with full run time configurability
-  def checkPipeline() {
+  def checkPipeline(): Unit = {
     require(numAddPipes!=0 | numMulPipes!=0, s"This design requires number of pipeline registers to be at least one")
   }
 }

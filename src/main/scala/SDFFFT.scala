@@ -74,7 +74,7 @@ class SDFFFT[T <: Data : Real : BinaryRepresentation](val params: FFTParams[T]) 
   else 
     numPoints := params.numPoints.U
 
-  when (io.in.fire()) {
+  when (io.in.fire) {
     cntWin := cntWin + 1.U
   }
   when (io.lastIn || cntWin === (numPoints - 1.U)) {

@@ -76,7 +76,7 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
 
   // simple state machine
   state_next := state
-  val fireLast = io.lastIn && io.in.fire()
+  val fireLast = io.lastIn && io.in.fire
 
   val lastStageCnt = cntr_wires(regNumStages-1.U)
   val lastStageEn = enableVector(regNumStages-1.U)
@@ -87,7 +87,7 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
       regNumStages := io.fftSize.getOrElse(numStages.U) // number of stages
       scaleBflyReg := io.keepMSBorLSBReg.getOrElse(VecInit(Seq.fill(numStages)(false.B)))
       fftOrifft := io.fftDirReg.getOrElse(params.fftDir.B)
-      when (io.in.fire()) { state_next := sProcess }
+      when (io.in.fire) { state_next := sProcess }
     }
     is (sProcess) {
       when (fireLast) {
@@ -108,13 +108,13 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
   val lastIndeed = RegInit(false.B)
   val initialInDone = RegInit(false.B)
   val initialInDonePrev = RegInit(false.B)
-  val pktEnd = (cntValidOut === (numPoints - 1.U)) && io.out.fire()
+  val pktEnd = (cntValidOut === (numPoints - 1.U)) && io.out.fire
 
 
   when (state_next === sIdle) {
     initialInDone := false.B
   }
-  .elsewhen (cnt === (numPoints - 1.U) && io.in.fire()) {
+  .elsewhen (cnt === (numPoints - 1.U) && io.in.fire) {
     initialInDone := true.B
   }
   initialInDonePrev := initialInDone
@@ -130,7 +130,7 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
   when ((state_next === sIdle && pktEnd) || pktEnd) {
     cntValidOut := 0.U
   }
-  .elsewhen (io.out.fire()) {
+  .elsewhen (io.out.fire) {
     cntValidOut := cntValidOut + 1.U
   }
     
@@ -170,7 +170,7 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
     }
   }
   
-  val enableInit = io.in.fire() || (state === sFlush && io.out.ready)
+  val enableInit = io.in.fire || (state === sFlush && io.out.ready)
   
   when (state_next === sIdle) {
     cnt := 0.U
@@ -197,7 +197,7 @@ class SDFChainRadix22[T <: Data : Real : BinaryRepresentation](val params: FFTPa
     initialOutDone := false.B
   }
   
-  val validOutBeforePipes = Mux(numPoints === 2.U, RegNext(enableInit) && io.in.fire(), lastStageEn && initialOutDone)
+  val validOutBeforePipes = Mux(numPoints === 2.U, RegNext(enableInit) && io.in.fire, lastStageEn && initialOutDone)
   
   val rstProtoIQ = Wire(io.in.bits.cloneType)
   rstProtoIQ.real := Real[T].fromDouble(0.0)
